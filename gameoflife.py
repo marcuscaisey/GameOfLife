@@ -22,22 +22,23 @@ class GameOfLife:
         grid_size: Number of rows and columns of cells in the window.
         evolution_rate: The number of times per second that the system evolves.
         fps: Maximum frame rate.
+        fullscreen: Whether the game should be played in fullscreen.
     """
     BACKGROUND_COLOUR = (147, 147, 147)
     LIVE_CELL_COLOUR = (255, 255, 0)
     GRID_LINE_COLOUR = (180, 180, 180)
 
     def __init__(self, window_size: int, grid_size: int, evolution_rate: float,
-                 fps: float) -> None:
+                 fps: float, fullscreen: bool) -> None:
         pg.init()
         pg.display.set_caption("Conway's Game of Life")
-        self.window_size = window_size
+        self.window_size = window_size if not fullscreen else pg.display.Info().current_h
         self.grid_size = grid_size
         self.cell_size = window_size // grid_size
         self.fps = fps
         self.evolution_rate = evolution_rate
         self.grid_state = [[False for _ in range(grid_size)] for _ in range(grid_size)]
-        self.surface = pg.display.set_mode((window_size, window_size))
+        self.surface = pg.display.set_mode((window_size, window_size), fullscreen * pg.FULLSCREEN)
         self.clock = pg.time.Clock()
 
     def run(self) -> None:
@@ -220,7 +221,9 @@ parser.add_argument('-e', '--evo-rate', type=float, default=8, metavar='',
                     help='Number of times per second that the system evolves.')
 parser.add_argument('-f', '--fps', type=float, default=60, metavar='',
                     help='Maximum frame rate.')
+parser.add_argument('-F', '--fullscreen', action='store_true',
+                    help='Whether to play the game in fullscreen.')
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    GameOfLife(args.window_size, args.grid_size, args.evo_rate, args.fps).run()
+    GameOfLife(args.window_size, args.grid_size, args.evo_rate, args.fps, args.fullscreen).run()
